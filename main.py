@@ -22,7 +22,7 @@ class Main():
 	def __init__(self):
 		super(Main,self).__init__()
 		
-		self.token = "5825684574:AAFeFGfPREMpN2m9oxOvImqzBmMV5R-EOkM"
+		self.token = "5986676065:AAGLmfSyUt2Zw8lKsEmlLV46MxXowi7AFao"
 		self.bot = Bot(token=self.token)
 		self.dp = Dispatcher(self.bot)
 		logger.log(status="CREATE", text="Created USER_BOT")
@@ -102,13 +102,13 @@ class Main():
 
 
 				self.connect.add_chats_list(self.user_one, self.user_two)
+				self.connect.save()
 
 				new_lot = {
 					'user_one':message.from_user.id,
 					'user_two':self.user_two,
 				}
 				self.bundle.append(new_lot)
-				print(self.bundle)
 
 			else:
 				# Собеседнек не найден
@@ -136,7 +136,6 @@ class Main():
 		@self.dp.message_handler(content_types="text")
 		async def text_types(message: Message):
 			self.read_user(message.from_user.id)
-			print(self.status)
 			if self.status == "communication":
 				# Если пользователь отправил сообщение другому пользователю
 
@@ -146,6 +145,7 @@ class Main():
 						message.text,
 						"None",
 						self.chat_id_in_list)
+				self.connect.save()
 
 				# Отправка сообщения пользователю
 				await self.bot.send_message(self.check_second_bundle(message.from_user.id), 
@@ -173,6 +173,7 @@ class Main():
 						"*video*",
 						random_path_video,
 						self.chat_id_in_list)
+				self.connect.save()
 
 				# Отправка сообщения пользователю
 				await self.bot.send_video(
@@ -200,6 +201,7 @@ class Main():
 						"*image*",
 						random_path_image,
 						self.chat_id_in_list)
+				self.connect.save()
 
 				# Отправка сообщения пользователю
 				await self.bot.send_photo( 
@@ -261,7 +263,7 @@ class Main():
 
 			Вернёт True, если пользователь найден
 		'''
-		record = self.connect.research_user_two()
+		record = self.connect.research_user_two(user_id)
 
 		if record is not None: # Если не пусто
 
@@ -270,11 +272,13 @@ class Main():
 
 			# Удаление записи из поиска
 			self.connect.del_in_search(self.user_two)
+			self.connect.save()
 
 			return True
 
 		else:
 			self.connect.add_in_search(user_id)
+			self.connect.save()
 
 			return False
 
@@ -285,6 +289,8 @@ class Main():
 		logger.log(status="INSERT", text="Insert new user - " + str(user_id))
 		
 		self.connect.add_new_user(user_id, user_name)
+		self.connect.save()
+
 #	Run
 if __name__ == '__main__':
 	engine = Main()

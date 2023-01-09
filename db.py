@@ -49,50 +49,17 @@ class Base():
 		'''
 		with open('users.json', 'w') as base_users:
 			json.dump(self.users, base_users)
-		logger.log(status="SAVE", text="USERS Base")
 
 		with open('user_in_search.json', 'w') as base_user_in_search:
 			json.dump(self.user_in_search, base_user_in_search)
-		logger.log(status="SAVE", text="USER_IN_SEARCH Base")
 
 		with open('chats_list.json', 'w') as base_chats_list:
 			json.dump(self.chats_list, base_chats_list)
-		logger.log(status="SAVE", text="CHAT_LIST Base")
 
 		with open('chat.json', 'w') as base_chat:
 			json.dump(self.chat, base_chat)
-		logger.log(status="SAVE", text="CHAT Base")
 
-	def views(self):
-		while True:
-			print()
-			print()
-			print()
-			print()
-			print()
-			print()
-
-			print("users:")
-			for lot in self.users:
-				print("    "+lot)
-			print("-----------")
-
-			print("user_in_search:")
-			for lot in self.user_in_search:
-				print("    "+lot)
-			print("-----------")
-
-			print("chats_list:")
-			for lot in self.chats_list:
-				print("    "+lot)
-			print("-----------")
-
-			print("chat:")
-			for lot in self.chat:
-				print("    "+lot)
-			print("-----------")
-
-			time.sleep(5)
+		logger.log(status="SAVE", text="Save DataBase")
 
 	#	USERS
 	def add_new_user(self, user_id, user_name):
@@ -113,15 +80,23 @@ class Base():
 	
 
 	#	USER_IN_SEARCH
-	def research_user_two(self):
+	def research_user_two(self, user_id):
 		if len(self.user_in_search) != 0:
-			return self.user_in_search[0]['user_id']
+			if user_id != self.user_in_search[0]['user_id']:
+				return self.user_in_search[0]['user_id']
 
 	def add_in_search(self, user_id):
-		new_lot = {
-			"user_id" : user_id
-		}
-		self.user_in_search.append(new_lot)
+		# Ищем, есть ли уже такой пользователь
+		for lot_index in range(len(self.user_in_search)):
+			if self.user_in_search[lot_index]['user_id'] == user_id:
+				# Если да, то остановить поиск и НЕ добавлять юзера
+				break
+			else:
+				# Если нет, то добавить в очередь
+				new_lot = {
+					"user_id" : user_id
+				}
+				self.user_in_search.append(new_lot)
 
 	def del_in_search(self, user_id):
 		for lot_index in range(len(self.user_in_search)):
@@ -149,3 +124,4 @@ class Base():
 			"chat_id": chat_id
 		}
 		self.chat.append(new_lot)
+		logger.log(status="INSERT", text="Sand meassage:" + str(user_id) + " -> " + str(user_recipient))
