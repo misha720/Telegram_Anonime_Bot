@@ -35,7 +35,7 @@ class Main():
 		self.user_one = "" # Айди 1 Собеседника
 		self.user_two = "" # Айди 2 Собеседника
 		self.chat_id_in_list = "" # Айди чата
-		self.bundle = [] # Айди активных связок пользователей в chats_list
+		self.bundle = self.connect.bundle # Айди активных связок пользователей в chats_list
 
 	async def loop(self):
 
@@ -100,9 +100,8 @@ class Main():
 					'Собеседник найден!\nЧто бы закончить общение, напишите "/stop"', 
 					reply_markup=ReplyKeyboardRemove())
 
-
 				self.connect.add_chats_list(self.user_one, self.user_two)
-				self.connect.save()
+				self.connect.save(self.bundle)
 
 				new_lot = {
 					'user_one':message.from_user.id,
@@ -145,11 +144,33 @@ class Main():
 						message.text,
 						"None",
 						self.chat_id_in_list)
-				self.connect.save()
+				self.connect.save(self.bundle)
 
 				# Отправка сообщения пользователю
 				await self.bot.send_message(self.check_second_bundle(message.from_user.id), 
 					message.text)
+
+
+		# STICKER
+		@self.dp.message_handler(content_types="sticker")
+		async def text_types(message: Message):
+			self.read_user(message.from_user.id)
+			if self.status == "communication":
+				# Если пользователь отправил сообщение другому пользователю
+
+				sticker_id = str(message.sticker.file_id)
+
+				# Сохранение запроса
+				self.connect.add_chat (message.from_user.id, 
+						self.check_second_bundle(message.from_user.id),
+						sticker_id,
+						"None",
+						self.chat_id_in_list)
+				self.connect.save(self.bundle)
+
+				# Отправка сообщения пользователю
+				await self.bot.send_sticker(self.check_second_bundle(message.from_user.id),
+					sticker_id)
 
 
 		# VIDEO
@@ -173,7 +194,7 @@ class Main():
 						"*video*",
 						random_path_video,
 						self.chat_id_in_list)
-				self.connect.save()
+				self.connect.save(self.bundle)
 
 				# Отправка сообщения пользователю
 				await self.bot.send_video(
@@ -201,7 +222,7 @@ class Main():
 						"*image*",
 						random_path_image,
 						self.chat_id_in_list)
-				self.connect.save()
+				self.connect.save(self.bundle)
 
 				# Отправка сообщения пользователю
 				await self.bot.send_photo( 
@@ -272,13 +293,13 @@ class Main():
 
 			# Удаление записи из поиска
 			self.connect.del_in_search(self.user_two)
-			self.connect.save()
+			self.connect.save(self.bundle)
 
 			return True
 
 		else:
 			self.connect.add_in_search(user_id)
-			self.connect.save()
+			self.connect.save(self.bundle)
 
 			return False
 
@@ -289,10 +310,10 @@ class Main():
 		logger.log(status="INSERT", text="Insert new user - " + str(user_id))
 		
 		self.connect.add_new_user(user_id, user_name)
-		self.connect.save()
+		self.connect.save(self.bundle)
 
 #	Run
 if __name__ == '__main__':
 	engine = Main()
 	asyncio.run(engine.loop())
-	engine.connect.save()
+	engine.connect.save(self.bundle)

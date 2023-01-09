@@ -43,7 +43,10 @@ class Base():
 		with open('chat.json', 'r') as base_chat:
 			self.chat = json.load(base_chat)
 
-	def save(self):
+		with open('bundle_active.json', 'r') as base_bundle:
+			self.bundle = json.load(base_bundle)
+
+	def save(self, new_bundle):
 		'''
 			Сохраняет все действия с БД
 		'''
@@ -58,6 +61,9 @@ class Base():
 
 		with open('chat.json', 'w') as base_chat:
 			json.dump(self.chat, base_chat)
+
+		with open('bundle_active.json', 'w') as base_bundle:
+			json.dump(self.bundle, base_bundle)
 
 		logger.log(status="SAVE", text="Save DataBase")
 
@@ -91,12 +97,11 @@ class Base():
 			if self.user_in_search[lot_index]['user_id'] == user_id:
 				# Если да, то остановить поиск и НЕ добавлять юзера
 				break
-			else:
-				# Если нет, то добавить в очередь
-				new_lot = {
-					"user_id" : user_id
-				}
-				self.user_in_search.append(new_lot)
+		# Если нет, то добавить в очередь
+		new_lot = {
+			"user_id" : user_id
+		}
+		self.user_in_search.append(new_lot)
 
 	def del_in_search(self, user_id):
 		for lot_index in range(len(self.user_in_search)):
